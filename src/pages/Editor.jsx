@@ -117,6 +117,7 @@ export default function Editor() {
 <style>${code.css}</style>
 </head>
 <body>
+${code.html}
 ${consoleHook}
 <script>
 try {
