@@ -8,7 +8,12 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/knotic';
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('Error: MONGODB_URI environment variable is not defined.');
+  process.exit(1);
+}
 
 // Middleware
 app.use(cors());
@@ -116,14 +121,26 @@ app.delete('/api/projects/:id', async (req, res) => {
 });
 
 // Connect to MongoDB and start server
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to MongoDB database successfully');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('Mongoose connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('Mongoose disconnected from MongoDB');
+});
+
 mongoose
   .connect(MONGODB_URI)
   .then(() => {
-    console.log('Connected to MongoDB successfully');
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch((error) => {
-    console.error('Failed to connect to MongoDB:', error);
+    console.error('Failed to initialize MongoDB connection:', error);
+    process.exit(1);
   });
