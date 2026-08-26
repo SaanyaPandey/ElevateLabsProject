@@ -1,54 +1,104 @@
-import { supabase } from './supabaseClient'
+const API_URL = '/api/projects';
 
 export async function fetchProjects() {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('id, name, description, created_at, updated_at')
-    .order('updated_at', { ascending: false })
-
-  if (error) throw error
-  return data
+  const response = await fetch(API_URL);
+  if (!response.ok) {
+    throw new Error('Failed to fetch projects');
+  }
+  const data = await response.json();
+  return data.map((p) => ({
+    id: p._id,
+    name: p.title,
+    description: p.description,
+    created_at: p.createdAt,
+    updated_at: p.updatedAt,
+  }));
 }
 
 export async function fetchProject(id) {
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle()
-
-  if (error) throw error
-  return data
+  const response = await fetch(`${API_URL}/${id}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch project');
+  }
+  const p = await response.json();
+  return {
+    id: p._id,
+    name: p.title,
+    description: p.description,
+    html: p.html,
+    css: p.css,
+    js: p.js,
+    created_at: p.createdAt,
+    updated_at: p.updatedAt,
+  };
 }
 
 export async function createProject({ name, description = '', html = '', css = '', js = '' }) {
-  const { data, error } = await supabase
-    .from('projects')
-    .insert({ name, description, html, css, js })
-    .select()
-    .single()
-
-  if (error) throw error
-  return data
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      title: name,
+      description,
+      html,
+      css,
+      js,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to create project');
+  }
+  const p = await response.json();
+  return {
+    id: p._id,
+    name: p.title,
+    description: p.description,
+    html: p.html,
+    css: p.css,
+    js: p.js,
+    created_at: p.createdAt,
+    updated_at: p.updatedAt,
+  };
 }
 
 export async function updateProject(id, updates) {
-  const { data, error } = await supabase
-    .from('projects')
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('id', id)
-    .select()
-    .maybeSingle()
+  // Map updates.name to title if it exists
+  const body = { ...updates };
+  if (body.name !== undefined) {
+    body.title = body.name;
+    delete body.name;
+  }
 
-  if (error) throw error
-  return data
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update project');
+  }
+  const p = await response.json();
+  return {
+    id: p._id,
+    name: p.title,
+    description: p.description,
+    html: p.html,
+    css: p.css,
+    js: p.js,
+    created_at: p.createdAt,
+    updated_at: p.updatedAt,
+  };
 }
 
 export async function deleteProject(id) {
-  const { error } = await supabase
-    .from('projects')
-    .delete()
-    .eq('id', id)
-
-  if (error) throw error
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete project');
+  }
 }
