@@ -16,33 +16,46 @@ app.use(express.json());
 
 // Routes
 
+app.get('/', (req, res) => {
+  console.log('GET / - Status check requested');
+  res.json({ message: 'Knotic Backend API is running successfully' });
+});
+
 // 1. Fetch all projects (sorted by updated time)
 app.get('/api/projects', async (req, res) => {
+  console.log('GET /api/projects - Fetching all projects from database');
   try {
     const projects = await Project.find({}, 'title description html css js createdAt updatedAt').sort({ updatedAt: -1 });
+    console.log(`GET /api/projects - Successfully fetched ${projects.length} project(s)`);
     res.json(projects);
   } catch (error) {
+    console.error('GET /api/projects - Error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
 // 2. Fetch single project by ID
 app.get('/api/projects/:id', async (req, res) => {
+  console.log(`GET /api/projects/${req.params.id} - Fetching project details`);
   try {
     const project = await Project.findById(req.params.id);
     if (!project) {
+      console.warn(`GET /api/projects/${req.params.id} - Project not found`);
       return res.status(404).json({ error: 'Project not found' });
     }
+    console.log(`GET /api/projects/${req.params.id} - Successfully fetched project: "${project.title}"`);
     res.json(project);
   } catch (error) {
+    console.error(`GET /api/projects/${req.params.id} - Error:`, error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
 // 3. Create project
 app.post('/api/projects', async (req, res) => {
+  const { title, description, html, css, js } = req.body;
+  console.log(`POST /api/projects - Creating project: "${title || 'Untitled Project'}"`);
   try {
-    const { title, description, html, css, js } = req.body;
     const project = new Project({
       title: title || 'Untitled Project',
       description: description || '',
@@ -51,18 +64,22 @@ app.post('/api/projects', async (req, res) => {
       js: js || '',
     });
     await project.save();
+    console.log(`POST /api/projects - Successfully created project with ID: ${project._id}`);
     res.status(201).json(project);
   } catch (error) {
+    console.error('POST /api/projects - Error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
 // 4. Update project by ID
 app.put('/api/projects/:id', async (req, res) => {
+  const { title, description, html, css, js } = req.body;
+  console.log(`PUT /api/projects/${req.params.id} - Request to update project: "${title || ''}"`);
   try {
-    const { title, description, html, css, js } = req.body;
     const project = await Project.findById(req.params.id);
     if (!project) {
+      console.warn(`PUT /api/projects/${req.params.id} - Project not found`);
       return res.status(404).json({ error: 'Project not found' });
     }
 
@@ -73,21 +90,27 @@ app.put('/api/projects/:id', async (req, res) => {
     if (js !== undefined) project.js = js;
 
     await project.save();
+    console.log(`PUT /api/projects/${req.params.id} - Successfully updated project: "${project.title}"`);
     res.json(project);
   } catch (error) {
+    console.error(`PUT /api/projects/${req.params.id} - Error:`, error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
 // 5. Delete project by ID
 app.delete('/api/projects/:id', async (req, res) => {
+  console.log(`DELETE /api/projects/${req.params.id} - Request to delete project`);
   try {
     const project = await Project.findByIdAndDelete(req.params.id);
     if (!project) {
+      console.warn(`DELETE /api/projects/${req.params.id} - Project not found`);
       return res.status(404).json({ error: 'Project not found' });
     }
+    console.log(`DELETE /api/projects/${req.params.id} - Successfully deleted project: "${project.title}"`);
     res.json({ message: 'Project deleted successfully' });
   } catch (error) {
+    console.error(`DELETE /api/projects/${req.params.id} - Error:`, error.message);
     res.status(500).json({ error: error.message });
   }
 });

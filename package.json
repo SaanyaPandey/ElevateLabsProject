@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "npm --prefix server start",
+    "server": "npm --prefix server run dev",
     "dev:all": "concurrently -n \"frontend,backend\" -c \"blue,green\" \"npm run dev\" \"npm run server\"",
     "build": "vite build",
     "lint": "eslint .",

@@ -101,7 +101,7 @@ export default function Editor() {
   console.error = function() { orig.error.apply(console, arguments); send('error', arguments); };
   console.info = function() { orig.info.apply(console, arguments); send('info', arguments); };
   window.addEventListener('error', function(e) {
-    send('error', [e.message + ' (' + (e.filename || '').replace(/^.*\//, '') + ':' + e.lineno + ':' + e.colno + ')']);
+    send('error', [e.message + ' (' + (e.filename || '').replace(/^.*\\//, '') + ':' + e.lineno + ':' + e.colno + ')']);
   });
   window.addEventListener('unhandledrejection', function(e) {
     var msg = 'Unhandled Promise Rejection';
@@ -109,16 +109,42 @@ export default function Editor() {
     send('error', [msg]);
   });
 })();
-<\/script>`
-    return `<!DOCTYPE html>
+<\/script>`;
+
+    let previewHtml = '';
+    const hasHtmlTag = /<html/i.test(code.html);
+    const hasHeadTag = /<head/i.test(code.html);
+    const hasBodyTag = /<body/i.test(code.html);
+
+    if (hasHtmlTag || hasBodyTag || hasHeadTag) {
+      let tempHtml = code.html;
+      const injectHead = `${consoleHook}\n<style>${code.css}</style>`;
+      if (hasHeadTag) {
+        tempHtml = tempHtml.replace(/<head([^>]*)>/i, `<head$1>\n${injectHead}`);
+      } else if (hasHtmlTag) {
+        tempHtml = tempHtml.replace(/<html([^>]*)>/i, `<html$1>\n<head>\n${injectHead}\n</head>`);
+      } else {
+        tempHtml = `<head>\n${injectHead}\n</head>\n${tempHtml}`;
+      }
+
+      const injectJs = `<script>\ntry {\n${code.js}\n} catch(e) {\n  console.error(e);\n}\n<\/script>`;
+      if (tempHtml.includes('</body>')) {
+        previewHtml = tempHtml.replace('</body>', `${injectJs}\n</body>`);
+      } else if (tempHtml.includes('</html>')) {
+        previewHtml = tempHtml.replace('</html>', `${injectJs}\n</html>`);
+      } else {
+        previewHtml = `${tempHtml}\n${injectJs}`;
+      }
+    } else {
+      previewHtml = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8" />
+${consoleHook}
 <style>${code.css}</style>
 </head>
 <body>
 ${code.html}
-${consoleHook}
 <script>
 try {
 ${code.js}
@@ -127,7 +153,10 @@ ${code.js}
 }
 </script>
 </body>
-</html>`
+</html>`;
+    }
+
+    return previewHtml;
   }, [code])
 
   useEffect(() => {
@@ -354,7 +383,7 @@ ${code.js}
               srcDoc={buildPreview()}
               title="Live Preview"
               className="w-full h-full border-0"
-              sandbox="allow-scripts allow-modals"
+              sandbox="allow-scripts allow-same-origin allow-modals"
             />
           </div>
 
