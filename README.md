@@ -117,3 +117,5 @@ Once running, open your browser and navigate to the address shown by Vite (norma
 
 
  Built with 💜 by **Saanya Pandey**.
+ <hr>
+ You can preview the project by directly clicking on the link <a href="https://elevate-labs-project-six.vercel.app/">PROJECT PREVIEW</a>
