@@ -1,4 +1,4 @@
-# 🔮 Knotic (CodeCraft)
+# 🔮 CodeCraft
 
 An interactive, responsive online code playground for front-end developers to write, preview, and manage HTML, CSS, and JavaScript projects directly in the browser.
 
@@ -115,18 +115,5 @@ Once running, open your browser and navigate to the address shown by Vite (norma
 
 ---
 
-## 🔮 Roadmap & Future Plan
 
-Here is the upcoming development plan for enhancing the **Knotic (CodeCraft)** playground:
-
-- [ ] **Collaborative Coding:** Real-time multiplayer editing using WebSockets / CRDTs.
-- [ ] **Custom Library Import:** A CDN search bar allowing developers to easily inject external packages (like Bootstrap, Lodash, or jQuery) into their workspace.
-- [ ] **Preprocessors Support:** Integration for Sass/SCSS compilation and TypeScript transpilation inside the code compiler.
-- [ ] **User Accounts & Auth:** Implement secure user registration and custom dashboards using Supabase Auth or JWT tokens.
-- [ ] **Template Gallery:** A collection of pre-designed frontend code snippets (landing pages, buttons, animations) for instant loading.
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License. Built with 💜 by **Saanya Pandey**.
+ Built with 💜 by **Saanya Pandey**.
