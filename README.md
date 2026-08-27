@@ -4,7 +4,7 @@ An interactive, responsive online code playground for front-end developers to wr
 
 ---
 
-## 👤 Owner & Lead Developer
+## 👤 Owner & Developer
 **Saanya Pandey** 
 
 ---
@@ -62,7 +62,7 @@ project/
 
 ## ⚙️ Setup & Installation
 
-Follow these steps to run both the frontend and backend of Knotic locally.
+Follow these steps to run both the frontend and backend of Codecraft locally.
 
 ### 1. Prerequisite Settings
 Make sure you have [Node.js](https://nodejs.org/) (v16+ recommended) installed.
